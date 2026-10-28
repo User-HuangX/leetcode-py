@@ -1,5 +1,17 @@
+from xmlrpc.client import FastMarshaller
+from typing import Optional
+from typing import Any
 from collections import deque
+class ListNode:
+    def __init__(self, x):
+        self.val = x
+        self.next = None
 
+class Node:
+    def __init__(self, x: int, next: 'Node' = None, random: 'Node' = None):
+        self.val = int(x)
+        self.next = next
+        self.random = random
 
 class Solution:
     # 先查询是否存在再存入值
@@ -272,3 +284,254 @@ class Solution:
                 return i + 1
 
         return n + 1
+    # 将矩阵的首行和首列置0作为标记即可，注意标记过后直接遍历修改非首行内容防止污染标记，标记位最后处理
+    def setZeroes(self, matrix: list[list[int]]) -> None:
+
+        row_zero = False
+        col_zero = False
+
+        #特殊处理首行的0是否存在进行标记
+        for j in range(len(matrix[0])):
+            if matrix[0][j] == 0:
+                row_zero = True
+                break
+
+        # 特殊处理首列的0是否存在进行标记
+        for i in range(len(matrix)):
+            if matrix[i][0] == 0:
+                col_zero = True
+                break
+
+        #第一步找到0的位置
+        for i in range(1,len(matrix)):
+            for j in range(1,len(matrix[0])):
+                if matrix[i][j] == 0:
+                    matrix[i][0] = 0
+                    matrix[0][j] = 0
+
+        # 第一步找到0的位置
+        for i in range(1, len(matrix)):
+            for j in range(1, len(matrix[0])):
+                if matrix[0][j] == 0 or matrix[i][0] == 0:
+                    matrix[i][j] = 0
+
+        if row_zero:
+            for j in range(len(matrix[0])):
+                matrix[0][j] = 0
+
+        if col_zero:
+            for i in range(len(matrix)):
+                matrix[i][0] = 0
+
+    # 按照圈来计数，没一圈矩阵的行和宽-2，起始点行列+1，边界条件复杂需要注意
+    def spiralOrder(self, matrix: list[list[int]]) -> list[int]:
+        r: list[int] = []
+        m, n = len(matrix), len(matrix[0])
+        round = 0
+
+        while round < min(m, n) / 2:
+            for j in range(round, n - round):
+                r.append(matrix[round][j])
+
+            for i in range(round + 1, m - round):
+                r.append(matrix[i][n - round - 1])
+
+            if m - 2 * round > 1:
+                for j in range(n - round - 2, round - 1, -1):
+                    r.append(matrix[m - round - 1][j])
+
+            if n - 2 * round > 1:
+                for i in range(m - round - 2, round, -1):
+                    r.append(matrix[i][round])
+
+            round += 1
+    # 先转置后翻转
+    def rotate(self, matrix: list[list[int]]) -> None:
+        # 转置
+        for i in range(len(matrix)):
+            for j in range(i,len(matrix[0])):
+                    matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+        for m in matrix:
+            m.reverse()
+
+    def searchMatrix(self, matrix: list[list[int]], target: int) -> bool:
+        i = 0
+        j = len(matrix[0]) - 1
+        while True:
+
+            n = matrix[i][j]
+            if n == target:
+                return True
+            elif n < target:
+                i += 1
+            else:
+                j -= 1
+            if i >= len(matrix) or j < 0:return False
+    #路径和加起来是相同的 A + C + B = B + C + A 其中A为A链表，B为B链表，C为公共剩余部分
+    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+        p = headA
+        q = headB
+        while p is not q:
+            p = p.next if p is not None else headB
+            q = q.next if q is not None else headA
+
+        return p
+    #翻转链表，三个指针，4个步骤，先标记将丢失的指针(1)后直接改链(1)并转移(2)
+    def reverseList(self, head: ListNode | None) -> ListNode | None:
+        prev = None
+        curr = head
+        while curr is not None:
+            nxt = curr.next
+            curr.next = prev
+            prev = curr
+            curr = nxt
+
+        return prev
+    #细节很麻烦，思路很简单就是快指针走两步慢指针走一半，慢指针边走边翻转，最后慢指针和prev便利比对
+    def isPalindrome(self, head: Optional[ListNode]) -> bool:
+        slow = fast = head
+        prev = None
+        while fast and fast.next:
+            fast = fast.next.next
+
+            nxt = slow.nexthello
+            slow.next = prev
+            prev = slow
+            slow = nxt
+
+        if fast:
+            slow = slow.next
+
+        while prev and slow:
+            if prev.val != slow.val:
+                return False
+            prev = prev.next
+            slow = slow.next
+
+        return True
+    # 快指针不为空一直跑就行，相遇判断为环
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+        fast = slow = head
+        while fast and fast.next:
+            fast = fast.next.next
+            slow = slow.next
+            if fast == slow:
+                return True
+        return False
+
+    # 因为在慢指针超越1圈前快指针走完两圈，因此慢指针不可能走完一圈，剩余路程到到环入口是初始节点到环入口差几圈，该圈数等于快指针走的圈数
+    def detectCycle(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        fast = slow = head
+        while fast and fast.next:
+            fast = fast.next.next
+            slow = slow.next
+            if fast == slow:
+                fast = head
+                while fast != slow:
+                    fast = fast.next
+                    slow = slow.next
+                return slow
+        return None
+
+    # 标准的merge非常简单
+    def mergeTwoLists(self, list1: ListNode | None, list2: ListNode | None) -> ListNode | None:
+        head = ListNode()
+        p = head
+        while list1 and list2:
+            if list1.val < list2.val:
+                p.next = list1
+                list1 = list1.next
+            else:
+                p.next = list2
+                list2 = list2.next
+            p = p.next
+        p.next = list1 if list1 else list2
+        return head.next
+
+    # 两数相加，留个进位一起判0循环加就完了
+    def addTwoNumbers(self, l1: ListNode | None, l2: ListNode | None) -> ListNode | None:
+        carry = 0
+        p = head = ListNode()
+        while l1 or l2 or carry:
+            s = (l1.val if l1 else 0) + (l2.val if l2 else 0) + carry
+            carry, d = divmod(s, 10)
+            p.next = ListNode(d)
+            p = p.next
+            l1 = l1.next if l1 else None
+            l2 = l2.next if l2 else None
+        return head.next
+
+    #来个先走几步的节点就行，依旧水题，可能删掉头结点加个yum
+    def removeNthFromEnd(self, head: ListNode | None, n: int) -> ListNode | None:
+        fast = slow = yum = ListNode()
+        yum.next = head
+        while n:
+            n -= 1
+            fast = fast.next
+        while fast.next:
+            fast = fast.next
+            slow = slow.next
+
+        slow.next = slow.next.next
+        return yum.next
+    # 两个一组翻转链表
+    def swapPairs(self, head: ListNode | None) -> ListNode | None:
+        p = yum = ListNode()
+        yum.next = head
+        while p.next and p.next.next:
+            end = p.next.next
+            p.next.next = end.next
+            end.next = p.next
+            p.next = end
+            p = p.next.next
+        return yum.next
+    # 比较麻烦一步一步画图分析需要，先让一个指针跑n步(和删除类似)，然后将中间的链表翻转，随后跳转到之前标记的新的开头，这里就是之前开头的第二个节点
+    def reverseKGroup(self, head: ListNode | None, k: int) -> ListNode | None:
+        begin = end = yum = ListNode()
+        yum.next = head
+        for _ in range(k):
+            end = end.next if end else None
+        while end:
+            next_begin = p = begin.next
+            begin.next = end
+            mid = p.next
+            p.next = end.next
+            while p != end:
+                nxt = mid.next
+                mid.next = p
+                p = mid
+                mid = nxt
+            end = begin = next_begin
+            for _ in range(k):
+                end = end.next if end else None
+
+        return yum.next
+
+    # 深拷贝并维护关系，现实最优解是借助hash表，但是演示要求通过临时修改原链表完成，遍历三遍链表，第一遍复制第二遍改随机引用第三遍拆分
+    def copyRandomList(self, head: 'Optional[Node]') -> 'Optional[Node]':
+        if not head:
+            return None
+        # 第一次遍历，复制一份
+        p = head
+        while p:
+            nxt = p.next
+            p.next = Node(p.val)
+            p.next.next = nxt
+            p = nxt
+
+        # 标记开头
+        res = head.next
+
+        # 第二次遍历，注意处理随机关系
+        p = head
+        while p:
+            p.next.random = p.random.next if p.random else None
+            p = p.next.next
+
+        p = head
+        while p.next:
+            nxt = p.next
+            p.next = p.next.next if p.next else None
+            p = nxt
+
+        return res
