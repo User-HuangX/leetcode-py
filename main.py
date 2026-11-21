@@ -1,17 +1,23 @@
+import heapq
+import queue
 from xmlrpc.client import FastMarshaller
 from typing import Optional
 from typing import Any
 from collections import deque
+
+
 class ListNode:
     def __init__(self, x):
         self.val = x
         self.next = None
 
+
 class Node:
-    def __init__(self, x: int, next: 'Node' = None, random: 'Node' = None):
+    def __init__(self, x: int, next: "Node" = None, random: "Node" = None):
         self.val = int(x)
         self.next = next
         self.random = random
+
 
 class Solution:
     # 先查询是否存在再存入值
@@ -231,8 +237,8 @@ class Solution:
 
         n = len(nums)
         k %= n
-        reverse_range(nums, 0, n - 1)   # 整段翻
-        reverse_range(nums, 0, k - 1)   # 前 k 个翻回来
+        reverse_range(nums, 0, n - 1)  # 整段翻
+        reverse_range(nums, 0, k - 1)  # 前 k 个翻回来
         reverse_range(nums, k, n - 1)  # 后 n-k 个翻回来
 
     # 原是仨队列，前缀队列后缀队列，结果队列，但是可以统一放到结果队列里面，算一个O(1)的空间复杂度
@@ -261,7 +267,6 @@ class Solution:
             if 1 <= abs(num) <= n:
                 nums[abs(num) - 1] = -abs(nums[abs(num) - 1])
 
-
         # 遍历index找到最小非负index
         for i in range(n):
             if nums[i] > 0:
@@ -274,7 +279,7 @@ class Solution:
         n: int = len(nums)
         # 负数转换为无效的数字
         for i in range(n):
-            while(1 <= nums[i] <= n and nums[nums[i] - 1] != nums[i]):
+            while 1 <= nums[i] <= n and nums[nums[i] - 1] != nums[i]:
                 j = nums[i] - 1
                 nums[i], nums[j] = nums[j], nums[i]
 
@@ -284,13 +289,14 @@ class Solution:
                 return i + 1
 
         return n + 1
+
     # 将矩阵的首行和首列置0作为标记即可，注意标记过后直接遍历修改非首行内容防止污染标记，标记位最后处理
     def setZeroes(self, matrix: list[list[int]]) -> None:
 
         row_zero = False
         col_zero = False
 
-        #特殊处理首行的0是否存在进行标记
+        # 特殊处理首行的0是否存在进行标记
         for j in range(len(matrix[0])):
             if matrix[0][j] == 0:
                 row_zero = True
@@ -302,9 +308,9 @@ class Solution:
                 col_zero = True
                 break
 
-        #第一步找到0的位置
-        for i in range(1,len(matrix)):
-            for j in range(1,len(matrix[0])):
+        # 第一步找到0的位置
+        for i in range(1, len(matrix)):
+            for j in range(1, len(matrix[0])):
                 if matrix[i][j] == 0:
                     matrix[i][0] = 0
                     matrix[0][j] = 0
@@ -345,12 +351,13 @@ class Solution:
                     r.append(matrix[i][round])
 
             round += 1
+
     # 先转置后翻转
     def rotate(self, matrix: list[list[int]]) -> None:
         # 转置
         for i in range(len(matrix)):
-            for j in range(i,len(matrix[0])):
-                    matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+            for j in range(i, len(matrix[0])):
+                matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
         for m in matrix:
             m.reverse()
 
@@ -358,7 +365,6 @@ class Solution:
         i = 0
         j = len(matrix[0]) - 1
         while True:
-
             n = matrix[i][j]
             if n == target:
                 return True
@@ -366,9 +372,13 @@ class Solution:
                 i += 1
             else:
                 j -= 1
-            if i >= len(matrix) or j < 0:return False
-    #路径和加起来是相同的 A + C + B = B + C + A 其中A为A链表，B为B链表，C为公共剩余部分
-    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+            if i >= len(matrix) or j < 0:
+                return False
+
+    # 路径和加起来是相同的 A + C + B = B + C + A 其中A为A链表，B为B链表，C为公共剩余部分
+    def getIntersectionNode(
+        self, headA: ListNode, headB: ListNode
+    ) -> Optional[ListNode]:
         p = headA
         q = headB
         while p is not q:
@@ -376,7 +386,8 @@ class Solution:
             q = q.next if q is not None else headA
 
         return p
-    #翻转链表，三个指针，4个步骤，先标记将丢失的指针(1)后直接改链(1)并转移(2)
+
+    # 翻转链表，三个指针，4个步骤，先标记将丢失的指针(1)后直接改链(1)并转移(2)
     def reverseList(self, head: ListNode | None) -> ListNode | None:
         prev = None
         curr = head
@@ -387,14 +398,15 @@ class Solution:
             curr = nxt
 
         return prev
-    #细节很麻烦，思路很简单就是快指针走两步慢指针走一半，慢指针边走边翻转，最后慢指针和prev便利比对
+
+    # 细节很麻烦，思路很简单就是快指针走两步慢指针走一半，慢指针边走边翻转，最后慢指针和prev便利比对
     def isPalindrome(self, head: Optional[ListNode]) -> bool:
         slow = fast = head
         prev = None
         while fast and fast.next:
             fast = fast.next.next
 
-            nxt = slow.nexthello
+            nxt = slow.next
             slow.next = prev
             prev = slow
             slow = nxt
@@ -409,6 +421,7 @@ class Solution:
             slow = slow.next
 
         return True
+
     # 快指针不为空一直跑就行，相遇判断为环
     def hasCycle(self, head: Optional[ListNode]) -> bool:
         fast = slow = head
@@ -434,7 +447,9 @@ class Solution:
         return None
 
     # 标准的merge非常简单
-    def mergeTwoLists(self, list1: ListNode | None, list2: ListNode | None) -> ListNode | None:
+    def mergeTwoLists(
+        self, list1: ListNode | None, list2: ListNode | None
+    ) -> ListNode | None:
         head = ListNode()
         p = head
         while list1 and list2:
@@ -449,7 +464,9 @@ class Solution:
         return head.next
 
     # 两数相加，留个进位一起判0循环加就完了
-    def addTwoNumbers(self, l1: ListNode | None, l2: ListNode | None) -> ListNode | None:
+    def addTwoNumbers(
+        self, l1: ListNode | None, l2: ListNode | None
+    ) -> ListNode | None:
         carry = 0
         p = head = ListNode()
         while l1 or l2 or carry:
@@ -461,7 +478,7 @@ class Solution:
             l2 = l2.next if l2 else None
         return head.next
 
-    #来个先走几步的节点就行，依旧水题，可能删掉头结点加个yum
+    # 来个先走几步的节点就行，依旧水题，可能删掉头结点加个yum
     def removeNthFromEnd(self, head: ListNode | None, n: int) -> ListNode | None:
         fast = slow = yum = ListNode()
         yum.next = head
@@ -474,6 +491,7 @@ class Solution:
 
         slow.next = slow.next.next
         return yum.next
+
     # 两个一组翻转链表
     def swapPairs(self, head: ListNode | None) -> ListNode | None:
         p = yum = ListNode()
@@ -485,6 +503,7 @@ class Solution:
             p.next = end
             p = p.next.next
         return yum.next
+
     # 比较麻烦一步一步画图分析需要，先让一个指针跑n步(和删除类似)，然后将中间的链表翻转，随后跳转到之前标记的新的开头，这里就是之前开头的第二个节点
     def reverseKGroup(self, head: ListNode | None, k: int) -> ListNode | None:
         begin = end = yum = ListNode()
@@ -508,7 +527,7 @@ class Solution:
         return yum.next
 
     # 深拷贝并维护关系，现实最优解是借助hash表，但是演示要求通过临时修改原链表完成，遍历三遍链表，第一遍复制第二遍改随机引用第三遍拆分
-    def copyRandomList(self, head: 'Optional[Node]') -> 'Optional[Node]':
+    def copyRandomList(self, head: "Optional[Node]") -> "Optional[Node]":
         if not head:
             return None
         # 第一次遍历，复制一份
@@ -535,3 +554,87 @@ class Solution:
             p = nxt
 
         return res
+
+    # 空间复杂度为1的归并链表排序
+    def sortList(self, head: ListNode) -> ListNode:
+        # 这里的归并操作都是语言的，自底向上的算法才能到O(1)
+        def merge(head1: ListNode, head2: ListNode) -> ListNode:
+            dummyHead = ListNode(0)
+            temp, temp1, temp2 = dummyHead, head1, head2
+            while temp1 and temp2:
+                if temp1.val <= temp2.val:
+                    temp.next = temp1
+                    temp1 = temp1.next
+                else:
+                    temp.next = temp2
+                    temp2 = temp2.next
+                temp = temp.next
+            if temp1:
+                temp.next = temp1
+            elif temp2:
+                temp.next = temp2
+            return dummyHead.next
+
+        if not head:
+            return head
+
+        length = 0
+        node = head
+        while node:
+            length += 1
+            node = node.next
+
+        dummyHead = ListNode(0, head)
+        subLength = 1
+        while subLength < length:
+            prev, curr = dummyHead, dummyHead.next
+            while curr:
+                head1 = curr
+                for _ in range(1, subLength):
+                    if curr.next:
+                        curr = curr.next
+                    else:
+                        break
+                head2 = curr.next
+                curr.next = None
+                curr = head2
+
+                for _ in range(1, subLength):
+                    if curr and curr.next:
+                        curr = curr.next
+                    else:
+                        break
+
+                succ = None
+                if curr:
+                    succ = curr.next
+                    curr.next = None
+
+                merged = merge(head1, head2)
+                prev.next = merged
+                while prev.next:
+                    prev = prev.next
+                curr = succ
+            subLength <<= 1
+
+        return dummyHead.next
+
+    def mergeKLists(self, lists: list[ListNode | None]) -> ListNode | None:
+        heap = []
+
+        for i, list in enumerate(lists):
+            if not list:
+                continue
+            heapq.heappush(heap, (list.val, i, list))
+        # 根据m找到最小的值的位置然后初始化dummy进行排序
+        dummy = ListNode()
+        head = dummy
+        while heap:
+            _, i, list_head = heapq.heappop(heap)
+            if not list_head:
+                continue
+            head.next = list_head
+            list_head = list_head.next
+            heapq.heappush(heap, (list_head.val, i, list_head))
+            head = head.next
+        return dummy.next
