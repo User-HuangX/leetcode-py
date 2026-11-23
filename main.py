@@ -635,6 +635,7 @@ class Solution:
                 continue
             head.next = list_head
             list_head = list_head.next
-            heapq.heappush(heap, (list_head.val, i, list_head))
+            if list_head:
+                heapq.heappush(heap, (list_head.val, i, list_head))
             head = head.next
         return dummy.next
